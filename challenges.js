@@ -130,10 +130,16 @@ function after(count, func) {
 
 
 
-// CHALLENGE 6
+// CHALLENGE 6: Write a function delay that accepts a callback as the first parameter and the wait in milliseconds before allowing the callback to be invoked as the second parameter. Any additional arguments after wait are provided to func when it is invoked. HINT: research setTimeout();
 function delay(func, wait) {
-
+  return function() {
+    setTimeout(func, wait);
+  };
 }
+
+// const delayedFunc = delay(() => console.log('Oops!'), 3000);
+// delayedFunc();
+
 
 
 // CHALLENGE 7
