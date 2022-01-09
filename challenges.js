@@ -80,28 +80,54 @@ addByTwo(1) // 3
 
 
 // CHALLENGE 4: Write a function once that accepts a callback as input and returns a function. When the returned function is called the first time, it should call the callback and return that output. If it is called any additional times, instead of calling the callback again it will simply return the output value from the first time it was called.
+
 function once(func) {
-
+  let output;
+  return function(input) {
+    if (output) return output;
+    output = func(input);
+    return output;
+  };
 }
 
+function addByTwo(x){
+    return x+2;
+}
+
+const onceFunc = once(addByTwo);
+
+onceFunc(4); 			//6
+onceFunc(1000);  //6
+
 // /*** Uncomment these to check your work! ***/
-// const onceFunc = once(addByTwo);
-// console.log(onceFunc(4));  // => should log 6
-// console.log(onceFunc(10));  // => should log 6
-// console.log(onceFunc(9001));  // => should log 6
+ const onceFunc = once(addByTwo);
+ console.log(onceFunc(4));  // => should log 6
+ console.log(onceFunc(10));  // => should log 6
+ console.log(onceFunc(9001));  // => should log 6
 
 
-// CHALLENGE 5
+
+
+// CHALLENGE 5: Write a function after that takes the number of times the callback needs to be called before being executed as the first parameter and the callback as the second parameter.
 function after(count, func) {
-
+  let callsCount = 0;
+  return function() {
+    callsCount ++;
+    if (callsCount === count) {
+      return func();
+    }
+  }
 }
 
-// /*** Uncomment these to check your work! ***/
-// const called = function() { console.log('hello') };
-// const afterCalled = after(3, called);
-// afterCalled(); // => nothing is printed
-// afterCalled(); // => nothing is printed
-// afterCalled(); // => 'hello' is printed
+
+ /*** Uncomment these to check your work! ***/
+ const called = function() { console.log('hello') };
+ const afterCalled = after(3, called);
+ afterCalled();  //=> nothing is printed
+ afterCalled(); // => nothing is printed
+ afterCalled(); // => 'hello' is printed
+
+
 
 
 // CHALLENGE 6
