@@ -142,9 +142,17 @@ function delay(func, wait) {
 
 
 
-// CHALLENGE 7
+// CHALLENGE 7: Write a function rollCall that accepts an array of names and returns a function. The first time the returned function is invoked, it should log the first name to the console. The second time it is invoked, it should log the second name to the console, and so on, until all names have been called. Once all names have been called, it should log 'Everyone accounted for'.
 function rollCall(names) {
-
+  let index = 0;
+  return function() {
+    console.log(index);
+    if (index > names.length - 1) {
+      return console.log("Everyone accounted for");
+    }
+    console.log(names[index]);
+    index++;
+  };
 }
 
 // /*** Uncomment these to check your work! ***/
