@@ -165,7 +165,14 @@ function rollCall(names) {
 
 // CHALLENGE 8
 function saveOutput(func, magicWord) {
+  let store = {};
+  return function(input) {
+    if (input === magicWord) return store;
 
+    const result = func(input);
+    store[input] = result;
+    return result;
+  };
 }
 
 // /*** Uncomment these to check your work! ***/
@@ -175,10 +182,22 @@ function saveOutput(func, magicWord) {
 // console.log(multBy2AndLog(9)); // => should log 18
 // console.log(multBy2AndLog('boo')); // => should log { 2: 4, 9: 18 }
 
-
 // CHALLENGE 9
 function cycleIterator(array) {
+  let index = 0;
 
+  return function() {
+    const item = array[index];
+    console.log(index);
+
+    if (index === array.length - 1) {
+      index = 0;
+    } else {
+      index++;
+    }
+
+    return item;
+  };
 }
 
 // /*** Uncomment these to check your work! ***/
@@ -189,10 +208,11 @@ function cycleIterator(array) {
 // console.log(getDay()); // => should log 'Sun'
 // console.log(getDay()); // => should log 'Fri'
 
-
 // CHALLENGE 10
 function defineFirstArg(func, arg) {
-
+  return function(input) {
+    return func(arg, input);
+  };
 }
 
 // /*** Uncomment these to check your work! ***/
@@ -200,10 +220,14 @@ function defineFirstArg(func, arg) {
 // const subFrom20 = defineFirstArg(subtract, 20);
 // console.log(subFrom20(5)); // => should log 15
 
-
 // CHALLENGE 11
 function dateStamp(func) {
-
+  return function(...args) {
+    return {
+      date: Date.now(),
+      output: func(...args)
+    };
+  };
 }
 
 // /*** Uncomment these to check your work! ***/
@@ -211,10 +235,19 @@ function dateStamp(func) {
 // console.log(stampedMultBy2(4)); // => should log { date: (today's date), output: 8 }
 // console.log(stampedMultBy2(6)); // => should log { date: (today's date), output: 12 }
 
-
 // CHALLENGE 12
 function censor() {
+  let replaces = [];
 
+  return function(str1, str2) {
+    if (str2) {
+      replaces.push({ from: str1, to: str2 });
+    } else {
+      return replaces.reduce((text, currReplace) => {
+        return text.replace(currReplace.from, currReplace.to);
+      }, str1);
+    }
+  };
 }
 
 // /*** Uncomment these to check your work! ***/
@@ -223,22 +256,35 @@ function censor() {
 // changeScene('quick', 'slow');
 // console.log(changeScene('The quick, brown fox jumps over the lazy dogs.')); // => should log 'The slow, brown fox jumps over the lazy cats.'
 
-
 // CHALLENGE 13
 function createSecretHolder(secret) {
+  let _secret = secret;
 
+  return {
+    getSecret: () => {
+      return _secret;
+    },
+    setSecret: () => {
+      _secret = secret;
+    }
+  };
 }
 
 // /*** Uncomment these to check your work! ***/
-// obj = createSecretHolder(5)
-// obj.getSecret() // => returns 5
-// obj.setSecret(2)
-// obj.getSecret() // => returns 2
+// let obj = createSecretHolder(5)
+// console.log(
 
+// obj.getSecret(), // => returns 5
+// obj.setSecret(2),
+// obj.getSecret() // => returns 2
+// )
 
 // CHALLENGE 14
 function callTimes() {
-
+  let callsCount = 0;
+  return function() {
+    console.log(++callsCount);
+  };
 }
 
 // /*** Uncomment these to check your work! ***/
@@ -249,10 +295,21 @@ function callTimes() {
 // myNewFunc2(); // => 1
 // myNewFunc2(); // => 2
 
-
 // CHALLENGE 15
 function russianRoulette(num) {
+  let callsCount = 0;
+  let finished = false;
+  return function() {
+    if (finished) return "reload to play again";
 
+    callsCount++;
+    if (callsCount === num) {
+      finished = true;
+      return "bang";
+    }
+
+    return "click";
+  };
 }
 
 // /*** Uncomment these to check your work! ***/
@@ -263,14 +320,26 @@ function russianRoulette(num) {
 // console.log(play()); // => should log 'reload to play again'
 // console.log(play()); // => should log 'reload to play again'
 
-
 // CHALLENGE 16
 function average() {
+  let average = 0;
+  let numbers = [];
 
+  const calculateAverage = number => {
+    if (!numbers.length) return 0;
+    const sum = numbers.reduce((accum, currNum) => accum + currNum, 0);
+    return sum / numbers.length;
+  };
+
+  return function(number) {
+    if (!number) return calculateAverage(number);
+    numbers.push(number);
+    return calculateAverage(number);
+  };
 }
 
 // /*** Uncomment these to check your work! ***/
-// const avgSoFar = average();
+const avgSoFar = average();
 // console.log(avgSoFar()); // => should log 0
 // console.log(avgSoFar(4)); // => should log 4
 // console.log(avgSoFar(8)); // => should log 6
@@ -278,10 +347,14 @@ function average() {
 // console.log(avgSoFar(12)); // => should log 8
 // console.log(avgSoFar()); // => should log 8
 
-
 // CHALLENGE 17
 function makeFuncTester(arrOfTests) {
-  
+  return function(callback) {
+    return arrOfTests.every(test => {
+      const [first, second] = test;
+      return callback(first) === second;
+    });
+  };
 }
 
 // /*** Uncomment these to check your work! ***/
@@ -295,10 +368,23 @@ function makeFuncTester(arrOfTests) {
 // console.log(shouldCapitalizeLast(capLastAttempt1)); // => should log false
 // console.log(shouldCapitalizeLast(capLastAttempt2)); // => should log true
 
-
 // CHALLENGE 18
 function makeHistory(limit) {
+  let history = [];
 
+  return function(str) {
+    if (str === "undo") {
+      if (!history.length) {
+        return "nothing to undo";
+      }
+      const strToUndo = history[history.length - 1];
+      history = history.slice(0, -1);
+      return `${strToUndo} undone`;
+    }
+
+    history = [...history, str].slice(history.length === limit ? limit - 1 : 0);
+    return `${str} done`;
+  };
 }
 
 // /*** Uncomment these to check your work! ***/
@@ -312,10 +398,32 @@ function makeHistory(limit) {
 // console.log(myActions('undo')); // => should log 'code undone'
 // console.log(myActions('undo')); // => should log 'nothing to undo'
 
-
 // CHALLENGE 19
 function blackjack(array) {
+  let index = 0;
+  return function dealer(num1, num2) {
+    let hasLostGame = false;
+    let currentSum = 0;
+    return function player() {
+      if (hasLostGame) {
+        return "you are done!";
+      }
 
+      if (currentSum === 0) {
+        currentSum = num1 + num2;
+        return currentSum;
+      }
+
+      currentSum += array[index++];
+
+      if (currentSum > 21) {
+        hasLostGame = true;
+        return "bust";
+      }
+
+      return currentSum;
+    };
+  };
 }
 
 // /*** Uncomment these to check your work! ***/
